@@ -54,8 +54,7 @@ with TextAnalyticsClient(
     endpoint=os.environ["AZURE_LANGUAGE_ENDPOINT"],
     credential=credential,
 ) as client:
-    # Use client here
-    ...
+    languages = client.detect_language(["Hello, world!"])
 ```
 
 ### Legacy: API Key (existing keyed deployments)
@@ -71,8 +70,7 @@ with TextAnalyticsClient(
     endpoint=os.environ["AZURE_LANGUAGE_ENDPOINT"],
     credential=AzureKeyCredential(os.environ["AZURE_LANGUAGE_KEY"]),
 ) as client:
-    # Use client here
-    ...
+    languages = client.detect_language(["Hello, world!"])
 ```
 
 ## Sentiment Analysis

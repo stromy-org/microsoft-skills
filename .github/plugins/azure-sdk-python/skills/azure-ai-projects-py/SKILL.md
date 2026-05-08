@@ -51,8 +51,7 @@ with AIProjectClient(
     endpoint=os.environ["AZURE_AI_PROJECT_ENDPOINT"],
     credential=credential,
 ) as client:
-    # use client here
-    ...
+    deployments = list(client.deployments.list())
 ```
 
 ## Client Operations Overview

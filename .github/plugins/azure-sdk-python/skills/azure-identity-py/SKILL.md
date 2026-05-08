@@ -77,8 +77,7 @@ with BlobServiceClient(
     account_url="https://<account>.blob.core.windows.net",
     credential=credential
 ) as client:
-    # ...
-    ...
+    containers = list(client.list_containers())
 ```
 
 ### Credential Chain Order

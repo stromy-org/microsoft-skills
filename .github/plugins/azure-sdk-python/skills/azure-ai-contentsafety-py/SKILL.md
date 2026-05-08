@@ -43,6 +43,7 @@ CONTENT_SAFETY_KEY=<your-api-key>  # Only required for the legacy API-key auth p
 import os
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 from azure.ai.contentsafety import ContentSafetyClient
+from azure.ai.contentsafety.models import AnalyzeTextOptions
 
 # Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
 credential = DefaultAzureCredential(require_envvar=True)
@@ -54,8 +55,7 @@ with ContentSafetyClient(
     endpoint=os.environ["CONTENT_SAFETY_ENDPOINT"],
     credential=credential,
 ) as client:
-    # Use client here
-    ...
+    response = client.analyze_text(AnalyzeTextOptions(text="Hello, world!"))
 ```
 
 ### Legacy: API Key (existing keyed deployments)
@@ -66,13 +66,13 @@ New code should use `DefaultAzureCredential` above. Use `AzureKeyCredential` onl
 import os
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.contentsafety import ContentSafetyClient
+from azure.ai.contentsafety.models import AnalyzeTextOptions
 
 with ContentSafetyClient(
     endpoint=os.environ["CONTENT_SAFETY_ENDPOINT"],
     credential=AzureKeyCredential(os.environ["CONTENT_SAFETY_KEY"]),
 ) as client:
-    # Use client here
-    ...
+    response = client.analyze_text(AnalyzeTextOptions(text="Hello, world!"))
 ```
 
 The `BlocklistClient` accepts the same `AzureKeyCredential` if you also need to manage blocklists with a key.

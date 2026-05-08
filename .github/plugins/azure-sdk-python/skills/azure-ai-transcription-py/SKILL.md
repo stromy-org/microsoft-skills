@@ -39,8 +39,7 @@ with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
     credential=os.environ["TRANSCRIPTION_KEY"],
 ) as client:
-    # use client here
-    ...
+    transcriptions = list(client.list_transcriptions())
 ```
 
 ## Transcription (Batch)

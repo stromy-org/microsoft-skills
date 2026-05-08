@@ -56,8 +56,7 @@ with TextTranslationClient(
     endpoint=os.environ["AZURE_TRANSLATOR_ENDPOINT"],
     credential=credential,
 ) as client:
-    # Use client here
-    ...
+    result = client.translate(body=["Hello, world!"], to=["es"])
 ```
 
 ### Legacy: API Key (existing keyed deployments)
@@ -77,16 +76,14 @@ with TextTranslationClient(
     credential=AzureKeyCredential(os.environ["AZURE_TRANSLATOR_KEY"]),
     region=os.environ["AZURE_TRANSLATOR_REGION"],
 ) as client:
-    # Use client here
-    ...
+    result = client.translate(body=["Hello, world!"], to=["es"])
 
 # Key against a custom subdomain endpoint (no region required)
 with TextTranslationClient(
     endpoint=os.environ["AZURE_TRANSLATOR_ENDPOINT"],
     credential=AzureKeyCredential(os.environ["AZURE_TRANSLATOR_KEY"]),
 ) as client:
-    # Use client here
-    ...
+    result = client.translate(body=["Hello, world!"], to=["es"])
 ```
 
 ## Basic Translation

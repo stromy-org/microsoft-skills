@@ -43,6 +43,7 @@ VISION_KEY=<your-api-key>  # Only required for the legacy API-key auth path belo
 import os
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 from azure.ai.vision.imageanalysis import ImageAnalysisClient
+from azure.ai.vision.imageanalysis.models import VisualFeatures
 
 # Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
 credential = DefaultAzureCredential(require_envvar=True)
@@ -54,8 +55,10 @@ with ImageAnalysisClient(
     endpoint=os.environ["VISION_ENDPOINT"],
     credential=credential,
 ) as client:
-    # Use client here
-    ...
+    result = client.analyze_from_url(
+        image_url="https://aka.ms/azsdk/image-analysis/sample.jpg",
+        visual_features=[VisualFeatures.CAPTION],
+    )
 ```
 
 ### Legacy: API Key (existing keyed deployments)
@@ -66,13 +69,16 @@ New code should use `DefaultAzureCredential` above. Use `AzureKeyCredential` onl
 import os
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.vision.imageanalysis import ImageAnalysisClient
+from azure.ai.vision.imageanalysis.models import VisualFeatures
 
 with ImageAnalysisClient(
     endpoint=os.environ["VISION_ENDPOINT"],
     credential=AzureKeyCredential(os.environ["VISION_KEY"]),
 ) as client:
-    # Use client here
-    ...
+    result = client.analyze_from_url(
+        image_url="https://aka.ms/azsdk/image-analysis/sample.jpg",
+        visual_features=[VisualFeatures.CAPTION],
+    )
 ```
 
 ## Analyze Image from URL

@@ -56,8 +56,7 @@ with SearchClient(
     index_name=os.environ["AZURE_SEARCH_INDEX_NAME"],
     credential=credential,
 ) as client:
-    # Use client here
-    ...
+    results = list(client.search(search_text="*", top=5))
 ```
 
 ### Legacy: API Key (existing keyed deployments)
@@ -74,8 +73,7 @@ with SearchClient(
     index_name=os.environ["AZURE_SEARCH_INDEX_NAME"],
     credential=AzureKeyCredential(os.environ["AZURE_SEARCH_API_KEY"]),
 ) as client:
-    # Use client here
-    ...
+    results = list(client.search(search_text="*", top=5))
 ```
 
 ## Client Types
@@ -379,8 +377,7 @@ with SearchClient(
     index_name=os.environ["AZURE_SEARCH_INDEX_NAME"],
     credential=credential,
 ) as client:
-    # Use client here
-    ...
+    results = list(client.search(search_text="*", top=5))
 ```
 
 ## Client Selection

@@ -57,8 +57,7 @@ with DocumentTranslationClient(
     endpoint=os.environ["AZURE_DOCUMENT_TRANSLATION_ENDPOINT"],
     credential=credential,
 ) as client:
-    # Use client here
-    ...
+    statuses = list(client.list_translation_statuses())
 ```
 
 ### Legacy: API Key (existing keyed deployments)
@@ -74,8 +73,7 @@ with DocumentTranslationClient(
     endpoint=os.environ["AZURE_DOCUMENT_TRANSLATION_ENDPOINT"],
     credential=AzureKeyCredential(os.environ["AZURE_DOCUMENT_TRANSLATION_KEY"]),
 ) as client:
-    # Use client here
-    ...
+    statuses = list(client.list_translation_statuses())
 
 # SingleDocumentTranslationClient accepts the same key-based credential.
 ```

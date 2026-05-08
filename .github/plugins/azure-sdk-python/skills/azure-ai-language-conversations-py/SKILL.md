@@ -45,7 +45,7 @@ endpoint = os.environ["AZURE_CONVERSATIONS_ENDPOINT"]
 key = os.environ["AZURE_CONVERSATIONS_KEY"]
 
 with ConversationAnalysisClient(endpoint, AzureKeyCredential(key)) as client:
-    # Use client here
+    # See "Basic Conversation Analysis" below for the analyze_conversation payload
     ...
 ```
 

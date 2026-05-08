@@ -90,6 +90,9 @@ class AsyncConfigurationClient:
 - Mixing sync calls inside an `async def` (or awaiting inside a sync function) blocks the event loop, breaks context managers, and produces subtle concurrency bugs.
 
 ```python
+# Setup used by the snippets below
+endpoint = "https://example.services.ai.azure.com/api/projects/example"
+
 # ✅ Good — all sync
 from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
@@ -98,23 +101,28 @@ with AIProjectClient(endpoint=endpoint, credential=DefaultAzureCredential()) as 
     agent = client.agents.get_agent("agent-id")
 
 # ✅ Good — all async
-from azure.ai.projects.aio import AIProjectClient
-from azure.identity.aio import DefaultAzureCredential
+from azure.ai.projects.aio import AIProjectClient as AsyncAIProjectClient
+from azure.identity.aio import DefaultAzureCredential as AsyncDefaultAzureCredential
 
-async with DefaultAzureCredential() as credential, \
-           AIProjectClient(endpoint=endpoint, credential=credential) as client:
-    agent = await client.agents.get_agent("agent-id")
+async def run_async():
+    async with AsyncDefaultAzureCredential() as credential, \
+               AsyncAIProjectClient(endpoint=endpoint, credential=credential) as client:
+        agent = await client.agents.get_agent("agent-id")
 
-# ❌ Bad — sync client inside async function
-async def run():
-    from azure.ai.projects import AIProjectClient  # sync!
-    client = AIProjectClient(endpoint=endpoint, credential=cred)
-    agent = client.agents.get_agent("agent-id")  # blocks the event loop
+# ❌ Bad — sync client (azure.ai.projects) called from an async function:
+# the synchronous HTTP call blocks the event loop for the entire request.
+async def run_bad():
+    from azure.ai.projects import AIProjectClient  # sync client lives in azure.<service>
+    with AIProjectClient(endpoint=endpoint, credential=DefaultAzureCredential()) as client:
+        client.agents.get_agent("agent-id")  # ← blocking call inside `async def`
 
-# ❌ Bad — mixing sync and async credentials
-from azure.identity import DefaultAzureCredential          # sync
-from azure.ai.projects.aio import AIProjectClient          # async
-# Async client must be paired with azure.identity.aio.DefaultAzureCredential
+# ❌ Bad — async client (azure.<service>.aio) paired with sync DefaultAzureCredential:
+# the async client expects an async credential from azure.identity.aio.
+async def run_also_bad():
+    from azure.identity import DefaultAzureCredential          # sync
+    from azure.ai.projects.aio import AIProjectClient          # async
+    async with AIProjectClient(endpoint=endpoint, credential=DefaultAzureCredential()) as client:
+        await client.agents.get_agent("agent-id")  # credential.get_token() will block
 ```
 
 When writing a skill, pick one model based on the target runtime (FastAPI/async framework → async; scripts/CLIs → sync) and make every example in the skill consistent with that choice.

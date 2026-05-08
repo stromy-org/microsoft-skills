@@ -50,8 +50,7 @@ credential = DefaultAzureCredential(require_envvar=True)
 # See https://learn.microsoft.com/python/api/overview/azure/identity-readme?view=azure-python#credential-classes
 # credential = ManagedIdentityCredential()
 with ContentUnderstandingClient(endpoint=endpoint, credential=credential) as client:
-    # use client here
-    ...
+    analyzers = list(client.list_analyzers())
 ```
 
 ## Core Workflow
