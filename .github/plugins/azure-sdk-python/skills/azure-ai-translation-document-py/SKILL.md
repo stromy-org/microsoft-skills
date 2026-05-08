@@ -28,6 +28,7 @@ AZURE_DOCUMENT_TRANSLATION_ENDPOINT=https://<resource>.cognitiveservices.azure.c
 AZURE_SOURCE_CONTAINER_URL=https://<storage>.blob.core.windows.net/<container>?<sas>  # Required for all auth methods
 AZURE_TARGET_CONTAINER_URL=https://<storage>.blob.core.windows.net/<container>?<sas>  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
+AZURE_DOCUMENT_TRANSLATION_KEY=<your-api-key>  # Only required for the legacy API-key auth path below
 ```
 
 ## Authentication & Lifecycle
@@ -58,6 +59,25 @@ with DocumentTranslationClient(
 ) as client:
     # Use client here
     ...
+```
+
+### Legacy: API Key (existing keyed deployments)
+
+New code should use `DefaultAzureCredential` above. Use `AzureKeyCredential` only if you have an existing keyed deployment that hasn't been migrated to Entra ID yet — for example, regulated environments still completing their Entra rollout.
+
+```python
+import os
+from azure.core.credentials import AzureKeyCredential
+from azure.ai.translation.document import DocumentTranslationClient, SingleDocumentTranslationClient
+
+with DocumentTranslationClient(
+    endpoint=os.environ["AZURE_DOCUMENT_TRANSLATION_ENDPOINT"],
+    credential=AzureKeyCredential(os.environ["AZURE_DOCUMENT_TRANSLATION_KEY"]),
+) as client:
+    # Use client here
+    ...
+
+# SingleDocumentTranslationClient accepts the same key-based credential.
 ```
 
 ## Basic Document Translation

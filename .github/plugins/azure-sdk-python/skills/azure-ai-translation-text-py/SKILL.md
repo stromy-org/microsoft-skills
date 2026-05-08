@@ -23,8 +23,11 @@ pip install azure-ai-translation-text
 ## Environment Variables
 
 ```bash
-AZURE_TRANSLATOR_ENDPOINT=https://<resource>.cognitiveservices.azure.com  # Required for Entra ID auth
+AZURE_TRANSLATOR_ENDPOINT=https://<resource>.cognitiveservices.azure.com  # Required for Entra ID auth (must be a custom subdomain endpoint)
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
+# Only required for the legacy API-key auth path below:
+AZURE_TRANSLATOR_KEY=<your-api-key>
+AZURE_TRANSLATOR_REGION=<your-region>  # e.g., eastus, westus2; required when authenticating with a key against the global endpoint
 ```
 
 ## Authentication & Lifecycle
@@ -52,6 +55,35 @@ credential = DefaultAzureCredential(require_envvar=True)
 with TextTranslationClient(
     endpoint=os.environ["AZURE_TRANSLATOR_ENDPOINT"],
     credential=credential,
+) as client:
+    # Use client here
+    ...
+```
+
+### Legacy: API Key (existing keyed deployments)
+
+New code should use `DefaultAzureCredential` above. The Translator service has two specifics that make API-key auth still common in existing deployments:
+
+- **Token-credential auth requires a custom subdomain endpoint** (`https://<resource>.cognitiveservices.azure.com`). If you only have the global endpoint (`https://api.cognitive.microsofttranslator.com`), you must either provision a custom subdomain or stay on the key-based path until you do.
+- **Key + region** is the canonical setup against the global endpoint. The region is sent as the `Ocp-Apim-Subscription-Region` header and is required whenever you use a multi-service or global Translator key.
+
+```python
+import os
+from azure.core.credentials import AzureKeyCredential
+from azure.ai.translation.text import TextTranslationClient
+
+# Key + region against the global endpoint (most common keyed setup)
+with TextTranslationClient(
+    credential=AzureKeyCredential(os.environ["AZURE_TRANSLATOR_KEY"]),
+    region=os.environ["AZURE_TRANSLATOR_REGION"],
+) as client:
+    # Use client here
+    ...
+
+# Key against a custom subdomain endpoint (no region required)
+with TextTranslationClient(
+    endpoint=os.environ["AZURE_TRANSLATOR_ENDPOINT"],
+    credential=AzureKeyCredential(os.environ["AZURE_TRANSLATOR_KEY"]),
 ) as client:
     # Use client here
     ...

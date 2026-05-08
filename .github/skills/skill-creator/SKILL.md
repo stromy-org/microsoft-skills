@@ -140,7 +140,8 @@ Every Python Azure SDK skill MUST open its `## Authentication & Lifecycle` secti
 **Code sample enforcement.** Every client construction in the skill body must demonstrate both rules:
 
 - Show `with` / `async with` on every client instantiation in usage examples (not just the auth section).
-- Show `DefaultAzureCredential` in the primary auth example. If you must show an API-key alternative, isolate it in a clearly-labeled `### Alternative: API key (not recommended for production)` subsection.
+- Show `DefaultAzureCredential` in the primary auth example. **Do not delete API-key examples for SDKs where keys are still officially supported** — many existing users (especially in regulated environments still completing their Entra rollout) need a copy-pastable working sample. Demote the keyed snippet into a clearly-labeled `### Legacy: API Key (existing keyed deployments)` subsection placed *after* the primary `DefaultAzureCredential` block in the same `## Authentication & Lifecycle` section. Include a one-line note that new code should use `DefaultAzureCredential` and that the keyed path is for existing deployments. Also add the `<SERVICE>_KEY` env var back to the Environment Variables block with a `# Only required for the legacy API-key auth path below` comment.
+- A handful of services have key-specific quirks worth calling out in the Legacy subsection (e.g. `azure-ai-translation-text` requires a `region=` parameter when using a key against the global endpoint, because token-credential auth requires a custom subdomain endpoint). Surface these in the demoted block rather than dropping the example.
 - For async examples, wrap `DefaultAzureCredential` from `azure.identity.aio` in `async with credential:` alongside the client.
 
 ### Authentication Pattern (All Languages)

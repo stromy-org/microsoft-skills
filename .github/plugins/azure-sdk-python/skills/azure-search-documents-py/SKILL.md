@@ -26,6 +26,7 @@ pip install azure-search-documents
 AZURE_SEARCH_ENDPOINT=https://<service-name>.search.windows.net  # Required for all auth methods
 AZURE_SEARCH_INDEX_NAME=<your-index-name>  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
+AZURE_SEARCH_API_KEY=<your-api-key>  # Only required for the legacy API-key auth path below
 ```
 
 ## Authentication & Lifecycle
@@ -54,6 +55,24 @@ with SearchClient(
     endpoint=os.environ["AZURE_SEARCH_ENDPOINT"],
     index_name=os.environ["AZURE_SEARCH_INDEX_NAME"],
     credential=credential,
+) as client:
+    # Use client here
+    ...
+```
+
+### Legacy: API Key (existing keyed deployments)
+
+New code should use `DefaultAzureCredential` above. Use `AzureKeyCredential` only if you have an existing keyed deployment that hasn't been migrated to Entra ID yet — for example, regulated environments still completing their Entra rollout. The same `AzureKeyCredential` works with `SearchIndexClient` and `SearchIndexerClient` for admin operations.
+
+```python
+import os
+from azure.core.credentials import AzureKeyCredential
+from azure.search.documents import SearchClient
+
+with SearchClient(
+    endpoint=os.environ["AZURE_SEARCH_ENDPOINT"],
+    index_name=os.environ["AZURE_SEARCH_INDEX_NAME"],
+    credential=AzureKeyCredential(os.environ["AZURE_SEARCH_API_KEY"]),
 ) as client:
     # Use client here
     ...

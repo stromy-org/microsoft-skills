@@ -25,6 +25,7 @@ pip install azure-ai-vision-imageanalysis
 ```bash
 VISION_ENDPOINT=https://<resource>.cognitiveservices.azure.com  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
+VISION_KEY=<your-api-key>  # Only required for the legacy API-key auth path below
 ```
 
 ## Authentication & Lifecycle
@@ -52,6 +53,23 @@ credential = DefaultAzureCredential(require_envvar=True)
 with ImageAnalysisClient(
     endpoint=os.environ["VISION_ENDPOINT"],
     credential=credential,
+) as client:
+    # Use client here
+    ...
+```
+
+### Legacy: API Key (existing keyed deployments)
+
+New code should use `DefaultAzureCredential` above. Use `AzureKeyCredential` only if you have an existing keyed deployment that hasn't been migrated to Entra ID yet — for example, regulated environments still completing their Entra rollout.
+
+```python
+import os
+from azure.core.credentials import AzureKeyCredential
+from azure.ai.vision.imageanalysis import ImageAnalysisClient
+
+with ImageAnalysisClient(
+    endpoint=os.environ["VISION_ENDPOINT"],
+    credential=AzureKeyCredential(os.environ["VISION_KEY"]),
 ) as client:
     # Use client here
     ...

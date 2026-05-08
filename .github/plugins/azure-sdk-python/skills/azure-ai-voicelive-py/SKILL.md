@@ -23,6 +23,7 @@ pip install azure-ai-voicelive aiohttp azure-identity
 ```bash
 AZURE_COGNITIVE_SERVICES_ENDPOINT=https://<region>.api.cognitive.microsoft.com  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
+AZURE_COGNITIVE_SERVICES_KEY=<api-key>  # Only required for the legacy API-key auth path below
 ```
 
 ## Authentication & Lifecycle
@@ -54,6 +55,23 @@ async with DefaultAzureCredential(require_envvar=True) as credential:
         credential_scopes=["https://cognitiveservices.azure.com/.default"]
     ) as conn:
         ...
+```
+
+### Legacy: API Key (existing keyed deployments)
+
+New code should use `DefaultAzureCredential` above. Use `AzureKeyCredential` only if you have an existing keyed deployment that hasn't been migrated to Entra ID yet — for example, regulated environments still completing their Entra rollout.
+
+```python
+import os
+from azure.core.credentials import AzureKeyCredential
+from azure.ai.voicelive.aio import connect
+
+async with connect(
+    endpoint=os.environ["AZURE_COGNITIVE_SERVICES_ENDPOINT"],
+    credential=AzureKeyCredential(os.environ["AZURE_COGNITIVE_SERVICES_KEY"]),
+    model="gpt-4o-realtime-preview",
+) as conn:
+    ...
 ```
 
 ## Quick Start

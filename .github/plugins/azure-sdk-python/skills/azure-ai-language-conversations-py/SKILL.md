@@ -32,6 +32,23 @@ When responding to requests about Azure AI Language Conversations:
 
 `ConversationAnalysisClient` accepts a `TokenCredential` such as `DefaultAzureCredential`. Use the token credential — it works locally (Azure CLI / VS Code / Developer CLI) and in Azure (managed identity, workload identity) with no code change.
 
+### Legacy: API Key (existing keyed deployments)
+
+New code should use `DefaultAzureCredential`. Use `AzureKeyCredential` only if you have an existing keyed deployment that hasn't been migrated to Entra ID yet — for example, regulated environments still completing their Entra rollout.
+
+```python
+import os
+from azure.core.credentials import AzureKeyCredential
+from azure.ai.language.conversations import ConversationAnalysisClient
+
+endpoint = os.environ["AZURE_CONVERSATIONS_ENDPOINT"]
+key = os.environ["AZURE_CONVERSATIONS_KEY"]
+
+with ConversationAnalysisClient(endpoint, AzureKeyCredential(key)) as client:
+    # Use client here
+    ...
+```
+
 ## Best Practices
 - **Pick sync OR async and stay consistent.** Do not mix `azure.ai.language.conversations` sync clients with `azure.ai.language.conversations.aio` async clients in the same call path. Choose one mode per module.
 - **Always use context managers for clients and async credentials.** Wrap every client in `with ConversationAnalysisClient(...) as client:` (sync) or `async with ConversationAnalysisClient(...) as client:` (async). For async `DefaultAzureCredential` from `azure.identity.aio`, also use `async with credential:` so tokens and transports are cleaned up.
