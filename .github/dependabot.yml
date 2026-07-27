@@ -1,0 +1,48 @@
+# Volume is the thing to control here. Ungrouped, Dependabot opens one PR per
+# dependency per week; org-wide that reached 92 open PRs on 2026-07-27, well past
+# the point where anyone reads them.
+#
+# Grouping is by UPDATE TYPE rather than dependency-type, because the latter is only
+# supported by bundler/composer/mix/maven/npm/pip and is SILENTLY IGNORED in other
+# ecosystems (notably `uv`). The split below works everywhere and matches what the
+# dependabot-auto-merge workflow can land unattended:
+#
+#   patch  -> one PR per ecosystem per week, auto-merged once CI is green
+#   minor  -> one PR per ecosystem per week, one human review
+#   major  -> an individual PR each, always reviewed
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/docs-site"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      patch:
+        update-types: ["patch"]
+      minor:
+        update-types: ["minor"]
+
+  - package-ecosystem: "npm"
+    directory: "/tests"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      patch:
+        update-types: ["patch"]
+      minor:
+        update-types: ["minor"]
+
+  # Action bumps are pure CI plumbing and arrive constantly; one grouped PR a week.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns: ["*"]

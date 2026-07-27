@@ -1,0 +1,41 @@
+name: dependabot-auto-merge
+
+# Auto-merges low-risk Dependabot PRs once required CI checks pass:
+#   * any patch bump, and
+#   * minor bumps that are NOT a direct production dependency (dev tooling and
+#     transitive pins) — those cannot change this package's runtime behaviour.
+# Minor bumps of direct production deps, and every major, stay for human review.
+#
+# REQUIRES `allow_auto_merge: true` on the repo. It defaults to FALSE on every new
+# GitHub repo, and `gh pr merge --auto` is a SILENT no-op without it — the job still
+# reports success, so the breakage is invisible. Checked by stromy-org's
+# scripts/audit-repo-branch-hygiene.py.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge for low-risk updates
+        if: >-
+          ${{ steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+              (steps.meta.outputs.update-type == 'version-update:semver-minor' &&
+               steps.meta.outputs.dependency-type != 'direct:production') }}
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
